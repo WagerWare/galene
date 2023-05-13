@@ -1192,9 +1192,13 @@ func (g *Group) getPermission(creds ClientCredentials) (string, []string, error)
 		if err != nil {
 			return "", nil, err
 		}
+        groupName := g.name
+        if desc.AllowSubgroups {
+            groupName = strings.Split(groupName, "/")[0]
+        }
 
 		username, perms, err =
-			tok.Check(conf.CanonicalHost, g.name, creds.Username)
+			tok.Check(conf.CanonicalHost, groupName, creds.Username)
 		if err != nil {
 			return "", nil, err
 		}

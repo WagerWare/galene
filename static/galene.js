@@ -3915,24 +3915,29 @@ async function start() {
         );
     }
 
-    let parms = new URLSearchParams(window.location.search);
-    if(window.location.search)
+    let parms = new URLSearchParams(window.location.hash.substr(1));
+    if(window.location.hash.substr(1))
         window.history.replaceState(null, '', window.location.pathname);
     setTitle(groupStatus.displayName || capitalise(group));
 
     addFilters();
     setMediaChoices(false).then(e => reflectSettings());
 
-    if(parms.has('token'))
-        token = parms.get('token');
+    if(parms.has('access_token'))
+        token = parms.get('access_token');
 
     if(token) {
+        setVisibility('left', false);
+        setVisibility('show-chat', true);
+        resizePeers();
+        presentRequested = 'both';
         await serverConnect();
     } else if(groupStatus.authPortal) {
-        window.location.href = groupStatus.authPortal;
+        window.location.href = groupStatus.authPortal.replace('{redirect_uri}', encodeURIComponent(window.location.href));
     } else {
-        setVisibility('login-container', true);
-        document.getElementById('username').focus()
+        alert('Please refresh this page');
+        // setVisibility('login-container', true);
+        // document.getElementById('username').focus()
     }
     setViewportHeight();
 }
